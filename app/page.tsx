@@ -1,113 +1,208 @@
-import Image from "next/image";
+"use client";
+import { useRouter } from "next/navigation";
+import ProductList from "./Components/ProductList";
+import { products as allProducts } from "./util/products";
+import { FaFilter, FaStar } from "react-icons/fa";
 
-export default function Home() {
+const Home: React.FC<{
+  searchParams: { brand?: string; color?: string; rating?: string };
+}> = ({ searchParams }) => {
+  const { brand, color, rating } = searchParams;
+  const router = useRouter();
+
+  let filteredProducts = allProducts;
+
+  if (brand) {
+    filteredProducts = filteredProducts.filter(
+      (product) => product.brand === brand
+    );
+  }
+
+  if (color) {
+    filteredProducts = filteredProducts.filter(
+      (product) => product.color === color
+    );
+  }
+
+  if (rating) {
+    filteredProducts = filteredProducts.filter(
+      (product) => product.rating.toString() === rating
+    );
+  }
+
+  const handleFilterChange = (key: string, value: string | boolean) => {
+    const params = new URLSearchParams(window.location.search);
+    if (value) {
+      params.set(key, value.toString());
+    } else {
+      params.delete(key);
+    }
+    router.push(`/?${params.toString()}`);
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="grid grid-cols-12 gap-2">
+      <div className="my-4 col-span-3 px-5 max-lg:hidden">
+        <div className="bg-[#F7F7F7] px-7 py-2 flex flex-col gap-4 rounded">
+          <h1 className="flex gap-2 items-center">
+            <FaFilter /> Filters by 
+          </h1>
+          <div className="flex flex-col gap-4">
+            <h3>CATEGORIES</h3>
+            <h5 className="text-lg font-semibold">Brands</h5>
+            <ul className="flex flex-col gap-2">
+              <li className="flex items-center justify-between">
+                <label className="text-sm" htmlFor="Apple">Apple</label>
+                <input
+                  type="checkbox"
+                  name="brand"
+                  id="Apple"
+                  checked={brand === "apple"}
+                  onChange={(e) =>
+                    handleFilterChange("brand", e.target.checked && "apple")
+                  }
+                />
+              </li>
+              <li className="flex items-center justify-between">
+                <label className="text-sm" htmlFor="Samsung">Samsung</label>
+                <input
+                  type="checkbox"
+                  name="brand"
+                  id="Samsung"
+                  checked={brand === "samsung"}
+                  onChange={(e) =>
+                    handleFilterChange("brand", e.target.checked && "samsung")
+                  }
+                />
+              </li>
+              <li className="flex items-center justify-between">
+                <label className="text-sm" htmlFor="Tecno">Tecno</label>
+                <input
+                  type="checkbox"
+                  name="brand"
+                  id="Tecno"
+                  checked={brand === "tecno"}
+                  onChange={(e) =>
+                    handleFilterChange("brand", e.target.checked && "tecno")
+                  }
+                />
+              </li>
+              <li className="flex items-center justify-between">
+                <label className="text-sm" htmlFor="Huawei">Huawei</label>
+                <input
+                  type="checkbox"
+                  name="brand"
+                  id="Huawei"
+                  checked={brand === "huawei"}
+                  onChange={(e) =>
+                    handleFilterChange("brand", e.target.checked && "huawei")
+                  }
+                />
+              </li>
+              <li className="flex items-center justify-between">
+                <label className="text-sm" htmlFor="Nokia">Nokia</label>
+                <input
+                  type="checkbox"
+                  name="brand"
+                  id="Nokia"
+                  checked={brand === "nokia"}
+                  onChange={(e) =>
+                    handleFilterChange("brand", e.target.checked && "nokia")
+                  }
+                />
+              </li>
+            </ul>
+          </div>
+          <hr />
+          <div className="flex flex-col gap-4">
+            <h3 className="text-lg font-semibold">Product Rating</h3>
+            <ul className="flex flex-col gap-2">
+              {[...Array(6)].map((_, index) => (
+                <li
+                  key={index}
+                  className="flex items-center justify-between text-gray-300"
+                >
+                  <label
+                    htmlFor={index.toString()}
+                    className="flex items-center"
+                  >
+                    {Array.from({ length: 5 }, (_, starIndex) => (
+                      <FaStar
+                        key={starIndex}
+                        className={
+                          starIndex < index ? "text-[#DBAB3B]" : "text-gray-300"
+                        }
+                      />
+                    ))}
+                  </label>
+                  <input
+                    type="checkbox"
+                    name="rating"
+                    id={index.toString()}
+                    checked={rating === index.toString()}
+                    onChange={(e) =>
+                      handleFilterChange(
+                        "rating",
+                        e.target.checked && index.toString()
+                      )
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <hr />
+          <div className="flex flex-col gap-4">
+            <h3 className="text-lg font-semibold">Color</h3>
+            <ul className="flex flex-col gap-2">
+              {["black", "blue", "gold", "silver", "purple"].map((color) => (
+                <li key={color} className="flex items-center justify-between">
+                  <label
+                    htmlFor={color}
+                    className={`flex items-center text-sm w-1/3 justify-between ${
+                      searchParams.color === color
+                        ? "font-semibold text-gray-800 "
+                        : "text-gray-600 "
+                    }`}
+                  >
+                    {color.charAt(0).toUpperCase() + color.slice(1)}
+                    <span
+                      className={`${
+                        color === "black"
+                          ? "bg-black"
+                          : color === "blue"
+                          ? "bg-blue-800"
+                          : color === "gold"
+                          ? "bg-[#DBAB3B]"
+                          : color === "silver"
+                          ? "bg-gray-300"
+                          : color === "purple"
+                          ? "bg-purple-800"
+                          : ""
+                      } rounded-full w-4 h-4 `}
+                    ></span>
+                  </label>
+                  <input
+                    type="checkbox"
+                    id={color}
+                    checked={searchParams.color === color}
+                    onChange={(e) =>
+                      handleFilterChange("color", e.target.checked ? color : "")
+                    }
+                    className="mr-2 cursor-pointer"
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="col-span-9 max-lg:col-span-12 max-lg:px-10">
+        <ProductList products={filteredProducts} />
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
-}
+};
+
+export default Home;
